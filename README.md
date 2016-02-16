@@ -33,7 +33,7 @@ $ express --hbs --git .
 ```
 * That command adds all of the basic components for an express app in your current directory using handlebars(hbs) as your view engine and also adds a .gitignore file for you
 
-* Now we can make our first git commit to start tracking our progress with the git version control software, also we will need to run npm install to properly download all of the package express needs to work
+* Now we can make our first git commit to start tracking our progress with the git version control software, also we will need to run npm install to properly download all of the packages express.js needs to work
 
 ```
 $ npm install
