@@ -167,3 +167,78 @@ $ mkdir public/partials/
 $ touch public/partials/landing.html public/partials/chat.html
 ```
 * The landing.html partial will serve as our login/register page and the chat.html partial will be, you guessed it, our chatroom page
+
+* We will need to do a few more steps to really see the results of our setup
+* In your public/javascripts/module.js file insert this line:
+
+```
+var app = angular.module('chatApp', ['ngRoute']);
+```
+
+* Here we define our angular module, give it a name, and define its dependencies, which in this case is angular routes('ngRoute')
+
+* Now in your public/javascripts/routes.js file insert this code:
+
+```
+app.config(function($routeProvider, $locationProvider){
+  $routeProvider
+  .when('/', {
+    templateUrl: '/partials/landing.html',
+    controller: 'MainController'
+  })
+  .when('/chat', {
+    templateUrl: '/partials/chat.html',
+    controller: 'MainController'
+  })
+  .otherwise({redirectTo:'/'});
+  $locationProvider.html5Mode(true);
+
+})
+```
+* This will define which partials will be inserted into the ng-view element depending on the url the users of the website will visit. It also determines which controller the partial will be utilizing. For simplicity sake, we will just have 1 large controller for this whole application.
+
+* Something else to point out,
+```
+ $locationProvider.html5Mode(true);
+```
+ in our public/javascripts/routes.js file in combination with
+```
+ <base href="/">
+```
+ in our public/index.html and
+```
+router.get('*', function(req, res, next) {
+  res.sendFile('index.html', {
+    root: __dirname + '/../public/'
+  });
+});
+```
+ which we inserted into our routes/index.js file will have the effect of removing the default hashtags in angular urls(if you're new to angular, you now know a solution to a problem you've never encountered before).
+
+ * Now the final step of our angular setup process is to create our controller and test it all out in the browser
+
+ * Insert this code into your public/javascripts/controllers.js file:
+
+ ```
+ app.controller('MainController', function($scope, $http){
+   $scope.message = "Test Message";
+ })
+ ```
+* Now that we created our controller for our partials and also added a property to the angular $scope object called message, we can render the $scope.message property in our public/partials/landing.html file by simply adding this line to the top of the file(we don't need any other html setup in our partials, just add that one line and nothing else):
+
+```
+{{message}}
+```
+
+* Now if you didn't forget anything, you should be able to refresh localhost:3000 in the browser and see this line of text(nodemon must be running your server still):
+
+```
+Test Message
+```
+
+* If you made it to this step with success, I would recommend marking this spot in time with git in the terminal:
+
+```
+$ git add -A
+
+```
