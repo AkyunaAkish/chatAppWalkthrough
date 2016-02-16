@@ -215,9 +215,9 @@ router.get('*', function(req, res, next) {
 ```
  which we inserted into our routes/index.js file will have the effect of removing the default hashtags in angular urls(if you're new to angular, you now know a solution to a problem you've never encountered before).
 
- * Now the final step of our angular setup process is to create our controller and test it all out in the browser
+* Now the final step of our angular setup process is to create our controller and test it all out in the browser
 
- * Insert this code into your public/javascripts/controllers.js file:
+* Insert this code into your public/javascripts/controllers.js file:
 
  ```
  app.controller('MainController', function($scope, $http){
@@ -242,3 +242,43 @@ Test Message
 $ git add -A
 $ git commit -m"Finished express/angular setup"
 ```
+
+# SASS/SCSS Setup
+* In order to complete this setup(at least the way I'm doing it) you'll need to install another package
+```
+$ npm install -g node-sass
+```
+* Node-sass will process your scss code into regular css and add it to your main public/stylesheets/style.css file
+
+* Before we can do that though, we'll need the sass folder/files:
+
+```
+$ mkdir public/sass
+$ mkdir public/sass/components
+$ touch public/sass/style.scss
+$ touch public/sass/components/_base.scss
+```
+
+* I'm not going to go to deep into SASS/SCSS in this walkthrough but will go through the basic setup process,  and will mainly use regular css syntax
+
+* Insert this line into your public/sass/style.scss file in order to use the code in your public/sass/components/\_base.scss file
+```
+@import 'components/base';
+```
+* Before we test to make sure we set it up correctly, you'll need to reserve another tab in your terminal for node-sass to compile your styling when you're working on this app. In that new terminal tab(in the root directory of this application) run this command:
+
+```
+$ node-sass --watch public/sass/style.scss -o public/stylesheets/
+```
+* This will watch your style.scss file and output the compiled css code into your main style.css file
+
+* If you insert this code into your public/sass/components/\_base.scss file and save it, you should see some green text in the terminal tab that is running your node-sass command:
+
+```
+body{
+  background-color: dodgerblue;
+  color: white;
+}
+```
+* Now if you refresh localhost:3000 in the browser you should see a blue background and your $scope.message text should be colored white. That is about the extent I will explain SASS/SCSS in this walkthrough, I have another more in depth walkthrough if you are interested in going deeper into that topic. Keep your node-sass tab running so that you can continue to style your pages from the public/sass/components/\_base.scss file.
+* Link to page with SASS/SCSS walkthrough: www.akyunaakish.com/blog
