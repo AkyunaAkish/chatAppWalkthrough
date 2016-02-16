@@ -92,7 +92,7 @@ router.get('/', function(req, res, next) {
 * With this:
 
 ```
-//Keep at the bottom of your index.js routes file always (right about the module.exports line)
+//Keep at the bottom of your index.js routes file always (right above the module.exports line)
 router.get('*', function(req, res, next) {
   res.sendFile('index.html', {
     root: __dirname + '/../public/'
@@ -158,7 +158,7 @@ $ touch public/javascripts/routes.js
 * Next, I added the ng-app attribute to the html element which correlates to the name of our angular module(which will will get to soon) and lets angular know where our application begins.
 * Next is the ng-cloak attribute which makes sure there is no flashes of angular bracket syntax shown the the user(don't worry if that doesn't makes sense right now)
 * Next is the ng-view element which is where angular-routes will insert your html partials into in order to give the illusion that you are on a website with many pages. When actually angular is just moving html snippets in and out of the ng-view element, thus creating the effect of the single page application.
-* And of course, we need to pull in our angular files so I added them with script tags on the bottom of the index.html file 
+* And of course, we need to pull in our angular files so I added them with script tags on the bottom of the index.html file
 
 * Now let's make a partials folder and create a couple of files within it:
 
