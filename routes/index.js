@@ -1,9 +1,17 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+
+
+
+
+
+
+//Keep at the bottom of your index.js routes file always (right about the module.exports line)
+router.get('*', function(req, res, next) {
+  res.sendFile('index.html', {
+    root: __dirname + '/../public/'
+  });
 });
 
 module.exports = router;
