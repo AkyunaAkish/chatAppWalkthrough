@@ -240,5 +240,5 @@ Test Message
 
 ```
 $ git add -A
-
+$ git commit -m"Finished express/angular setup"
 ```
