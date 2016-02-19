@@ -398,3 +398,93 @@ app.controller('MainController', function($scope, $http){
 Test messageExample
 ```
 * If you're there congrats you've just connected socket.io from your back-end to your front-end ! Git add and git commit, it's a good milestone.
+
+# Knex.js/postgresql setup
+* This is where we will set up our database.
+* Just a brief explanation of knex.js: Knex.js is an abstraction on pg( a postgresql database driver), postgresql is an abstraction on SQL and finally we have SQL itself which this whole knex/pg/postgresql infrastructure is built on top of. Knex.js allows for easier interaction between you and your Postgresql database - in a nut shell.
+
+* You will need to get knex and pg installed as well as initialize knex like so:
+```
+$ npm install --save knex@0.9.0
+$ npm install --save pg
+$ knex init
+```
+* At the time of writing this, the newest version of knex had some issues, so to get past that I specifically installed version 0.9.0. But this may soon not be an issue so you could potentially leave off the \@0.9.0 - if you get some issues try downgrading and see if that helps.
+
+* After writing knex init you should see this output in the terminal:
+```
+Created ./knexfile.js
+```
+
+* Open your new knexfile.js and replace all of the code inside with this:
+```
+module.exports = {
+
+  development: {
+    client: 'postgresql',
+    connection: 'postgresql://localhost/knex-chat',
+    pool: {
+      min: 2,
+      max: 10
+    }
+  }
+
+};
+```
+* To keep it simple, we'll just use one database environment(development), define postgresql as our "client". Then define our connection to your local knex-chat database. Try not to worry too much about the pool for this walkthrough. Research it if you're curious. You don't actually have a knex-chat database yet, so let's create it so knex will know what you're talking about.
+
+* In the terminal run this command to create your knex-chat database:
+```
+$ createdb knex-chat
+```
+* Now we'll use knex to create a migrations folder and make a create_humans migrations file from within the terminal with this command:
+```
+$ knex migrate:make create_chat
+```
+* Now you should have a newly created migrations folder in your application. Open the file within it and you should see something like this:
+```
+exports.up = function(knex, Promise) {
+
+};
+
+exports.down = function(knex, Promise) {
+
+};
+```
+* This is where we can define our schemas, lets create the schema for a users table and a messages table:
+```
+//We will use this to create 2 tables, users and messages. The messages table will //contain userIds so we can track who wrote each message to properly display the //username and the message together when we render the messages with angular
+
+exports.up = function(knex, Promise) {
+  return knex.schema
+  .createTable('users', function (table) {
+    table.increments();
+    table.string('username');
+    table.string('password');
+    table.timestamps();
+  })
+  .createTable('messages', function (table) {
+    table.increments();
+    table.integer('userId');
+    table.string('message');
+    table.timestamps();
+  })
+};
+
+//Leave exports.down blank for now
+exports.down = function(knex, Promise) {
+
+};
+
+```
+
+* Now if you run this command, your schema should be correctly established in your local knex-chat postgresql database:
+```
+$ knex migrate:latest
+```
+
+* Note: If you make a mistake here you will have to remove your local db and start over with the migrations process by deleting the entire migrations file and running this command in the terminal:
+```
+$ dropdb knex-humans
+```
+* Then you'll have to run the knex migrate commands again. Hopefully you won't need to know that but that's how to do that if you need to .
