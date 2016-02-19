@@ -89,7 +89,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 ```
-* With this:
+* With this(this is called a wildcard route because the \'\*' catches all improperly typed urls and sends the index.html file):
 
 ```
 //Keep at the bottom of your index.js routes file always (right above the module.exports line)
@@ -280,5 +280,121 @@ body{
   color: white;
 }
 ```
-* Now if you refresh localhost:3000 in the browser you should see a blue background and your $scope.message text should be colored white. That is about the extent I will explain SASS/SCSS in this walkthrough, I have another more in depth walkthrough if you are interested in going deeper into that topic. Keep your node-sass tab running so that you can continue to style your pages from the public/sass/components/\_base.scss file.
-* Link to page with SASS/SCSS walkthrough: www.akyunaakish.com/blog
+* Now if you refresh localhost:3000 in the browser you should see a blue background and your $scope.message text should be colored white. That is about the extent I will explain SASS/SCSS in this walkthrough, I have another more in depth walkthrough if you are interested in going deeper into that topic. Keep your node-sass tab running so that you can continue to style your pages from the public/sass/components/\_base.scss file. While node-sass compiles your scss code into regular css code and outputs it into your public/stylesheets/style.css file.
+
+* Link to page with SASS/SCSS walkthrough: http://www.akyunaakish.com/blog/introtosass
+
+# Checking connection to between express and angular
+
+* Open your routes/index.js file and insert this code above your wildcard route(the route using the\'\*', and below line 2):
+
+```
+router.get('/test', function(req,res,next){
+  res.json('Test');
+})
+```
+* Change your controller(in your public/javascripts/controllers.js file) to look like this:
+```
+app.controller('MainController', function($scope, $http){
+  $http.get('/test').then(function(response){
+      $scope.message = response.data;
+  })
+})
+```
+
+* This will send a get request to your express route and set your $scope.message variable to the string that you sent back when you made the '/test' express route.
+
+* If you refresh localhost:3000 you should only see the text 'Test' on your page. If you have that then you have a proper connection between your front end(angular) and your backend(node/express)
+
+# Setting up socket.io to communicate back and forth between your front end and back end
+* Install socket.io in the terminal from the root directory of your application:
+```
+$ npm install --save socket.io
+```
+
+* Create a lib folder in the root directory of your application and make an io.js file inside of it:
+```
+$ mkdir lib
+$ touch lib/io.js
+```
+* Open your www file within your bin directory and add this to line 10(under the http variable):
+
+```
+var io = require('../lib/io');
+```
+
+* Then go down to around line 28/29 and replace this:
+```
+server.listen(port);
+```
+* With this:
+```
+var listener = server.listen(port);
+io.attach(listener);
+```
+
+* Those steps allow socket.io to be directly connected to your server and allows you to write socket.io code within your lib/io.js file
+
+* Go back into your lib/io.js file and insert this code:
+```
+var io = require('socket.io')();
+
+io.on('connection', function (socket) {
+
+  socket.emit('messageFeed', {test: 'messageExample'});
+
+});
+
+module.exports = io;
+
+```
+* This brings requires the socket.io module and then when a user connects to your server, that users socket will emit a json object with a key of test and string of 'messageExample' to the socket event of 'messageFeed'. You need to name your socket events so your front end can target the direct event. The module.exports completes the connection of your io.js file with your bin/www server file.
+
+* Now lets hook socket.io up to angular. Remember your angular index.html file? You wrote this near the bottom of that file:
+```
+<script src="/javascripts/module.js"></script>
+<script src="/javascripts/controllers.js"></script>
+<script src="/javascripts/routes.js"></script>
+```
+* You'll need to add one line above that which will load the socket.io file:
+```
+<script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/module.js"></script>
+<script src="/javascripts/controllers.js"></script>
+<script src="/javascripts/routes.js"></script>
+```
+
+* Go back to your controller in angular and add this code to respond to the socket.io event coming from the backend:
+```
+app.controller('MainController', function($scope, $http){
+
+  $http.get('/test').then(function(response){
+    $scope.message = response.data;
+  })
+
+  //create a variable to use socket.io
+  var socket = io();
+  //this is where you define a response behavior when the 'messageFeed' socket event is fired from the backend, in this case we set the data send from the backend to a $scope //variable $scope.chatMessages
+  socket.on('messageFeed', function (data) {
+    $scope.chatMessages = data;
+
+    // use $scope.apply in order to make sure the view is updated
+    // because this event was fired outside of Angular's digest
+    $scope.$apply();
+  })
+
+
+})
+```
+
+* Now go to your public/partials/landing.html file and make sure it looks like this so you can render the test property of your socket event(which will fire immediately the way we set it up):
+```
+{{message}}
+
+{{chatMessages.test}}
+```
+* Go refresh localhost:3000 and you should see this text:
+```
+Test messageExample
+```
+* If you're there congrats you've just connected socket.io from your back-end to your front-end ! Git add and git commit, it's a good milestone.
